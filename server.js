@@ -1,3 +1,8 @@
-if (process.env.Node_ENV!=='production'){
-    require('dotenv').config()
+const express=require('express')
+const app=express()
+app.set('view-engine','ejs')
+app.get('/',(req,res)=>{
+res.render('index.ejs',{name:"hena"})
 }
+)
+app.listen(3000)
