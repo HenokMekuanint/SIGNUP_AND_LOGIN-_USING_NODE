@@ -1,7 +1,11 @@
 const express=require('express')
 const app=express()
-const bcrypt=require('bcrypt')
+const passport = require('passport')
 
+const bcrypt=require('bcrypt')
+const initializepassport=require("./passport-config")
+
+initializepassport(passport)
 const users=[]
 app.set('view-engine','ejs')
 app.use(express.urlencoded({extended:false}))
