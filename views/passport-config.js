@@ -1,26 +1,30 @@
-const { authenticate } = require('passport')
-const bcrypt=require('bcrypt')
-const LocalStrategy=require('passport-local').Strategy
-function initialize(passport,getUerByEmail){
-    const authenticateUser=(email,password,done)=>{
-        const user=getUerByEmail(email)
-        if(user==email){
-            return done(null,false,{message:'No User with that email'})
-        }
-try {
-    if(await bcrypt.compare(password,user.password))
-    {
-        return done(null,user)
+const LocalStrategy = require('passport-local').Strategy
+const bcrypt = require('bcrypt')
+const methodOverride = require('method-override');
+
+function initialize(passport, getUserByEmail, getUserById) {
+  const authenticateUser = async (email, password, done) => {
+    const user = getUserByEmail(email)
+    if (user == null) {
+      return done(null, false, { message: 'No user with that email' })
     }
-    else{
-        return done(null,false,{message:"password incorrect"})
+
+    try {
+      if (await bcrypt.compare(password, user.password)) {
+        return done(null, user)
+      } else {
+        return done(null, false, { message: 'Password incorrect' })
+      }
+    } catch (e) {
+      return done(e)
     }
-} catch {
-    
+  }
+
+  passport.use(new LocalStrategy({ usernameField: 'email' }, authenticateUser))
+  passport.serializeUser((user, done) => done(null, user.id))
+  passport.deserializeUser((id, done) => {
+    return done(null, getUserById(id))
+  })
 }
-    }
- passport.use(new LocaleStrategy({usernameFiled:'email'}),
- authenticateUser)
- passport.serializeUser((user,done)=>{})
- passport.deserializeUser((id,done)=>{})
-}
+
+module.exports = initialize
